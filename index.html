@@ -1,0 +1,80 @@
+<html>
+	<head>
+		<link rel="stylesheet" href="lib/highlight.js/styles/github.css" />
+		<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+		<script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+		<script src="lib/highlight.js/highlight.pack.js"></script>
+		<script>
+			$(document).ready(function() {
+				
+				// -------------- this clip gives you what you want ----------------------------------------
+				
+				var codeHighlight = function(codeBlocks) {
+					if (codeBlocks.length > 0) {
+						codeBlocks.each(function(i, block) {
+							hljs.highlightBlock(block);
+						});
+						codeBlocks.addClass('codeHighlight');
+					}
+				}
+				
+				var processing = false;
+				$('body').on('DOMSubtreeModified', function(e) {
+					
+					/*
+					 * Avoid recursion errors with own code, jQuery and highlight.js,
+					 * the react only once to modifications.
+					 */
+					if (!processing) {
+						processing = true;
+						var newCodeBlocks = $(e.target).find('pre code:not(.codeHighlight)');
+						if (newCodeBlocks.length > 0) codeHighlight(newCodeBlocks);
+						processing = false;
+					}
+				});
+				
+				// On initialize,  highlight all existing code blocks.
+				codeHighlight($('pre code:not(.codeHighlight)'));
+				
+				// -----------------------------------------------------------------------------------------
+				
+				$('input[data-action="addablock"]').click(
+					function(ev) {
+						$('.fakeDescription').append(
+							"<pre><code>"+
+							"if (document.createEvent) {"+
+							"	element.dispatchEvent(event);"+
+							"} else {"+
+							"	element.fireEvent('on' + event.eventType, event);"+
+							"}"+
+							"</code></pre>"
+						);
+					}
+				)
+			});
+		</script>
+	</head>
+	<body>
+		<input type="button" data-action="addablock" value="add a block without warning" />
+		testi:
+		<pre><code>
+var element = $('textarea');}
+if (document.createEvent) {
+	event = document.createEvent('HTMLEvents');
+	event.initEvent('change', true, true);
+} else {
+	event = document.createEventObject();
+	event.eventType = 'change';
+}
+event.eventName = 'change';
+if (document.createEvent) {
+	element.dispatchEvent(event);
+} else {
+	element.fireEvent('on' + event.eventType, event);
+}
+		</code></pre>
+		<div class="fakeDescription">
+		im a fake description box.
+		</div>
+	</body>
+</html>
